@@ -1,7 +1,9 @@
 # dsh-md-composer
 
-> DSH Web 的 **Markdown 编辑器插件**：在输入框上方浮出一个正经的 Markdown 编辑器，写完一键写回。
+> **DSH 的 Markdown 编辑器插件**（桌面版 / Web 版通用）：在输入框上方浮出一个正经的 Markdown 编辑器，写完一键写回。
 > 基于 [Vditor](https://github.com/Vanessa219/vditor)，解析器 / 图标 / 中文语言包全部内联。
+>
+> 桌面版（Electron）与 Web 版用的是同一套 DSH 客户端插件机制；`dsh plugin --profile desktop add ...` 直接可用，不需要额外配置。
 
 DSH 的输入框是 Lexical 的 `contenteditable`，写长文档很吃力：没有预览、没有工具栏、改标题要手敲 `##`。
 这个插件给它配一个「外接编辑器」：`Ctrl+↑` 呼出，`Ctrl+↓` 写回，收起后直接回车发送。

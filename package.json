@@ -1,7 +1,7 @@
 {
   "name": "dsh-md-composer",
   "version": "0.2.0",
-  "description": "DSH Web plugin: a Markdown editor floating over the composer, powered by Vditor (offline parser, icons and zh_CN locale inlined).",
+  "description": "DSH plugin (desktop & web): a Markdown editor floating over the composer, powered by Vditor (offline parser, icons and zh_CN locale inlined).",
   "type": "module",
   "license": "MIT",
   "author": "lalilulelo3",
