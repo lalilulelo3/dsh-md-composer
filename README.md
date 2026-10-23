@@ -25,13 +25,25 @@ DSH 的输入框是 Lexical 的 `contenteditable`，写长文档很吃力：没�
 
 ## 安装
 
-**发布后（npm）：**
+**从 GitHub（当前推荐，不依赖 npm 账号）：**
+
+```powershell
+# tarball（推荐，不依赖 git；首次安装需要网络）
+dsh plugin --profile desktop add "https://github.com/lalilulelo3/dsh-md-composer/archive/refs/tags/v0.2.0.tar.gz"
+
+# 或 github: 协议（需要本机 git 与网络）
+dsh plugin --profile desktop add "github:lalilulelo3/dsh-md-composer#v0.2.0"
+```
+
+升级时把 URL 里的 tag 换成新版本即可。
+
+**从 npm（发布后）：**
 
 ```powershell
 dsh plugin --profile desktop add dsh-md-composer
 ```
 
-**本地目录 / 未发布时：**
+**本地目录（开发时）：**
 
 ```powershell
 dsh plugin --profile desktop add "C:\path\to\dsh-md-composer"
