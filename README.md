@@ -23,6 +23,22 @@ DSH 的输入框是 Lexical 的 `contenteditable`，写长文档很吃力：没�
 
 ---
 
+## 截图
+
+**会话中的编辑器**（贴在输入框上方，宽度跟随输入框）：
+
+![会话中的编辑器](https://raw.githubusercontent.com/lalilulelo3/dsh-md-composer/main/docs/panel-session.png)
+
+**输入两行**（块操作栏不再浮出，正文不再上下跳）：
+
+![输入两行](https://raw.githubusercontent.com/lalilulelo3/dsh-md-composer/main/docs/typing.png)
+
+**拖到最高**（标题行、工具栏、编辑区整体停在「对话 / 轨迹」分割线下方）：
+
+![拖到最高](https://raw.githubusercontent.com/lalilulelo3/dsh-md-composer/main/docs/drag-limit.png)
+
+---
+
 ## 安装
 
 **从 GitHub（当前推荐，不依赖 npm 账号）：**
