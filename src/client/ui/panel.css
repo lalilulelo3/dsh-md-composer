@@ -1,0 +1,394 @@
+/* ============================================================================
+   md-composer 面板样式
+   约定：注入的 <style> 是全局扁平表，因此所有类名一律 dshmd- 前缀，绝不裸用通用类名。
+   颜色优先取 DSH 的设计令牌（--dsw-* / --dsh-*），并带兜底值，令牌缺失时也不至于不可读。
+   ============================================================================ */
+
+.dshmd-panel {
+  /* 令牌映射：全部取 DSH 的语义令牌，主题（深/浅）由 DSH 自己切，本插件不写死颜色。
+     兜底值取自本机深色主题的实测值，令牌缺失时也不会不可读。 */
+  --dshmd-bg: var(--dsw-specific-input-major, #2c2c2e);
+  --dshmd-bg-head: var(--dsw-alias-bg-base, #151517);
+  --dshmd-border: var(--dsw-alias-border-l2, #ffffff1f);
+  --dshmd-border-strong: var(--dsw-alias-border-l3, #ffffff29);
+  --dshmd-fg: var(--dsw-alias-label-primary, #f9fafb);
+  --dshmd-fg-dim: var(--dsw-alias-label-secondary, #cfd3d6);
+  --dshmd-accent: var(--dsw-alias-brand-primary, #f9fafb);
+  /* 主按钮：这个主题里「品牌色」是近白色，配 label-primary-foreground 作前景 */
+  --dshmd-on-accent: var(--dsw-alias-label-primary-foreground, #0f1115);
+  --dshmd-hover: var(--dsw-alias-interactive-bg-hover, #ffffff14);
+  --dshmd-radius: 22px;
+
+  position: absolute;
+  /* 锚点是 composer 卡片内顶部的一条零高线，所以 bottom:0 就贴在输入框上沿 */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--dshmd-radius);
+  background: var(--dshmd-bg);
+  border: 1px solid var(--dshmd-border-strong);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .45);
+  /* 必须 visible：工具栏下拉超出面板时要能露出来 */
+  overflow: visible;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--dshmd-fg);
+  text-align: left;
+  animation: dshmd-pop .17s cubic-bezier(.2, .8, .3, 1);
+}
+
+@keyframes dshmd-pop {
+  from { opacity: 0; transform: translateY(10px) scale(.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- 拖拽把手（在面板上沿） ---------- */
+
+/*
+  把手画在上沿之外一点（`top: -3px`），拖起来顺手 —— 位置在面板顶上、随手就能抓到。
+  它可能被拉到视口之外，所以**还原不能只靠它**：
+  底栏有一个「还原」按钮兜底，永远点得到。
+*/
+.dshmd-resize {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+  z-index: 20;
+}
+.dshmd-resize::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 46px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--dshmd-border-strong);
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+.dshmd-resize:hover::before,
+.dshmd-resize.dshmd-resizing::before { opacity: 1; background: var(--dshmd-accent); }
+body.dshmd-resizing-body { user-select: none; cursor: ns-resize; }
+
+/* ---------- 头部 ---------- */
+
+.dshmd-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 8px 14px;
+  border-bottom: 1px solid var(--dshmd-border);
+  background: var(--dshmd-bg-head);
+  flex: 0 0 auto;
+  border-radius: var(--dshmd-radius) var(--dshmd-radius) 0 0;
+  /*
+   * 不要用 position: sticky / top: 0。
+   * 面板的滚动祖先是 DSH 的会话滚动容器（不是面板自己）；面板被拖高到
+   * 越过「对话 / 轨迹」tab 栏后，sticky 会把标题行钉在 tab 栏底部，
+   * 而工具栏和编辑区继续上移、被标题行压住 —— 这正是「标题行停住、
+   * 控件继续向上跑」的根因。高度上限已在 JS 里按 tab 栏底部夹住，
+   * 这里只保留层叠上下文（工具栏下拉要盖在正文上）。
+   */
+  z-index: 6;
+}
+.dshmd-title { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.dshmd-badge {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  /* 用中性悬浮底色 + 次要前景：不抢主按钮的视觉，也随主题走 */
+  background: var(--dshmd-hover);
+  color: var(--dshmd-fg-dim);
+  white-space: nowrap;
+}
+.dshmd-spacer { flex: 1 1 auto; }
+.dshmd-notice { font-size: 11.5px; color: var(--dshmd-fg-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dshmd-icon {
+  font-size: 12px;
+  padding: 3px 9px;
+  border: 1px solid var(--dshmd-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dshmd-fg-dim);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dshmd-icon:hover { color: var(--dshmd-fg); border-color: var(--dshmd-border-strong); background: var(--dshmd-hover); }
+.dshmd-icon:focus-visible { outline: 2px solid var(--dshmd-accent); outline-offset: 1px; }
+
+/* ---------- 主体 ---------- */
+
+.dshmd-body {
+  display: grid;
+  grid-template-columns: 1fr 190px;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+.dshmd-editor {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- 草稿栏 ---------- */
+
+.dshmd-drafts {
+  border-left: 1px solid var(--dshmd-border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--dshmd-bg-head);
+}
+.dshmd-drafts-head {
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--dshmd-border);
+  flex: 0 0 auto;
+}
+.dshmd-drafts-head small { color: var(--dshmd-fg-dim); font-weight: 400; }
+.dshmd-drafts ul { list-style: none; margin: 0; padding: 8px; overflow: auto; flex: 1 1 auto; }
+.dshmd-drafts li {
+  border: 1px solid var(--dshmd-border);
+  border-radius: 7px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  background: var(--dshmd-bg);
+}
+.dshmd-drafts li.dshmd-drafts-empty {
+  border-style: dashed;
+  color: var(--dshmd-fg-dim);
+  font-size: 11.5px;
+  text-align: center;
+  padding: 14px 8px;
+  line-height: 1.5;
+  background: transparent;
+}
+.dshmd-draft-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dshmd-draft-meta { font-size: 10.5px; color: var(--dshmd-fg-dim); margin: 2px 0 5px; }
+.dshmd-draft-acts { display: flex; gap: 4px; }
+.dshmd-draft-acts button {
+  font-size: 11px;
+  padding: 1px 7px;
+  border: 1px solid var(--dshmd-border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--dshmd-fg-dim);
+  cursor: pointer;
+}
+.dshmd-draft-acts button:hover { color: var(--dshmd-fg); border-color: var(--dshmd-accent); }
+
+/* 草稿栏底部的「存为草稿」：它操作的是上面的列表，所以贴着列表放 */
+.dshmd-drafts-foot {
+  flex: 0 0 auto;
+  padding: 8px;
+  border-top: 1px solid var(--dshmd-border);
+}
+.dshmd-drafts-foot .dshmd-btn { width: 100%; }
+
+/* ---------- 底栏（写回动作 + 还原） ---------- */
+
+.dshmd-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--dshmd-border);
+  background: var(--dshmd-bg-head);
+  flex: 0 0 auto;
+  border-radius: 0 0 var(--dshmd-radius) var(--dshmd-radius);
+}
+.dshmd-foot-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dshmd-btn {
+  font-size: 12px;
+  padding: 5px 11px;
+  border: 1px solid var(--dshmd-border);
+  border-radius: 7px;
+  background: var(--dshmd-bg);
+  color: var(--dshmd-fg);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dshmd-btn:hover { border-color: var(--dshmd-border-strong); background: var(--dshmd-hover); }
+.dshmd-btn:focus-visible { outline: 2px solid var(--dshmd-accent); outline-offset: 1px; }
+.dshmd-btn-primary { background: var(--dshmd-accent); border-color: var(--dshmd-accent); color: var(--dshmd-on-accent); }
+.dshmd-btn-ghost { background: transparent; color: var(--dshmd-fg-dim); }
+
+/* ---------- 工具行开关按钮（conversation.input.left） ---------- */
+
+.dshmd-toggle {
+  min-width: 30px;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--dshmd-border, var(--dsw-alias-border-l2, #2b323d));
+  border-radius: 7px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary, #98a2b3);
+  font: 600 11.5px var(--dsh-font-mono, ui-monospace, monospace);
+  cursor: pointer;
+}
+.dshmd-toggle:hover {
+  border-color: var(--dsw-alias-brand-primary, #4c8dff);
+  color: var(--dsw-alias-brand-primary, #4c8dff);
+}
+.dshmd-toggle:focus-visible { outline: 2px solid var(--dsw-alias-brand-primary, #4c8dff); outline-offset: 1px; }
+
+/* ============================================================================
+   Vditor 外观适配（只在本面板内生效）
+   ============================================================================ */
+
+/*
+  关键：`.vditor` 必须是**可收缩的 flex 项**，不能用 `height: 100%`。
+  用 100% 时在 flex 父级里算不准：面板被压矮后编辑区不会跟着收缩，
+  内容会溢出到面板外（表现为「编辑区只剩一条缝、光标跑到看不见的地方」）。
+  下面的 `min-height: 0` 是 flex 收缩的必要条件。
+*/
+.dshmd-editor .vditor {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* 内容区（Vditor 自带 overflow:auto）：确保它真的能滚，而不是被内容撑开 */
+.dshmd-editor .vditor-content {
+  min-height: 0;
+  overflow: hidden;
+}
+.dshmd-editor .vditor-ir,
+.dshmd-editor .vditor-wysiwyg,
+.dshmd-editor .vditor-sv {
+  min-height: 0;
+  overflow: auto;
+}
+
+/* 工具栏：Vditor 默认是 display:block，会按块级换行成多行；改 flex。
+   不能设 overflow: hidden/auto —— 否则二级菜单被裁切、点不到；
+   换成 flex-wrap 从根上避免按钮溢出到相邻栏底下。
+   再加层叠上下文，让下拉能盖在面板底部动作条与输入框之上。 */
+.dshmd-editor .vditor-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--dshmd-border);
+  background: var(--dshmd-bg-head);
+  overflow: visible;
+  min-height: 32px;
+  position: relative;
+  z-index: 5;
+}
+.dshmd-editor .vditor-toolbar__item,
+.dshmd-editor .vditor-toolbar__divider { flex: 0 0 auto; }
+.dshmd-editor .vditor-toolbar__item button { color: var(--dshmd-fg-dim); }
+.dshmd-editor .vditor-toolbar__item button:hover { background: var(--dshmd-hover); color: var(--dshmd-fg); }
+
+/* 下拉面板：只改配色与上限，绝不覆盖 display（Vditor 靠 display:none 收起） */
+.dshmd-editor .vditor-hint {
+  background: var(--dshmd-bg);
+  border: 1px solid var(--dshmd-border-strong);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
+  max-height: min(260px, 38vh);
+  overflow: auto;
+}
+.dshmd-editor .vditor-hint button { color: var(--dshmd-fg-dim); }
+.dshmd-editor .vditor-hint button:hover,
+.dshmd-editor .vditor-hint--current { background: var(--dshmd-hover) !important; color: var(--dshmd-fg) !important; }
+
+/* 空提示气泡：它是「按需填内容的空元素」，给背景色会在空着时显出一个灰椭圆 */
+.dshmd-editor .vditor-tip { background: transparent; border: 0; padding: 0; }
+.dshmd-editor .vditor-tip:not(:empty) {
+  background: var(--dshmd-border-strong);
+  border: 1px solid var(--dshmd-border-strong);
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--dshmd-fg);
+  font-size: 11.5px;
+}
+
+/* 编辑区 */
+.dshmd-editor .vditor-reset { color: var(--dshmd-fg); font-size: 13.5px; }
+.dshmd-editor .vditor-ir pre.vditor-reset,
+.dshmd-editor .vditor-wysiwyg pre.vditor-reset,
+.dshmd-editor .vditor-sv { background: transparent; padding: 12px 16px; }
+.dshmd-editor .vditor-reset blockquote {
+  border-left: 3px solid var(--dshmd-accent);
+  background: rgba(127, 127, 127, .10);
+}
+
+/* 说明：编辑区的「顶部净空」由 JS 按光标是否在表格里动态写入
+   （见 editor/vditor.ts 的 applyTablePanelClearance）——
+   不要用 `.vditor-panel--none` 是否可见来判断：块操作栏也是这个类，
+   输入换行时会出现/消失，导致正文上下跳一行。 */
+.dshmd-editor .vditor-reset table th { background: rgba(127, 127, 127, .12); }
+.dshmd-editor .vditor-counter { color: var(--dshmd-fg-dim); background: transparent; }
+
+/*
+ * Vditor 的块操作栏（上移 / 下移 / 删除块）。
+ * wysiwyg 模式下它会浮在空段落上，对 Markdown 写作没有用处，
+ * 而且会挤压正文、造成输入时上下跳动 —— 直接隐藏。
+ * 用 :has 精确匹配「含 data-type=up 按钮」的面板，不误伤表格控件栏。
+ */
+.dshmd-editor .vditor-panel--none:has(button[data-type="up"]) {
+  display: none !important;
+}
+
+/*
+ * Vditor 的 CSS 气泡（::after）会超出编辑区顶部，被父级 overflow 裁掉——
+ * 字数统计的悬停提示就是因此「完全被遮挡」。统一改用浏览器原生 title
+ * （工具栏按钮在 fillToolbarTips 里补，字数额外补），原生 tooltip 永不被裁剪。
+ */
+.dshmd-editor .vditor-tooltipped::after,
+.dshmd-editor .vditor-tooltipped::before {
+  display: none !important;
+}
+
+/* 源码/预览工具条（Desktop / Tablet / 微信 / 知乎）：直接隐藏 */
+.dshmd-editor .vditor-preview__action { display: none !important; }
+
+/* 大纲：保持 Vditor 的「占位挤压」语义（绝不做成浮层覆盖 —— 那样会挡住正文、
+   被盖住的部分既点不到也不会出现横向滚动条）。只把它收窄一点少占正文。 */
+.dshmd-editor .vditor-outline {
+  flex: 0 0 auto;
+  width: 180px;
+  max-width: 45%;
+  border-right: 1px solid var(--dshmd-border-strong);
+  background: var(--dshmd-bg-head);
+  overflow: auto;
+}
+.dshmd-editor .vditor-outline__title {
+  border-bottom: 1px solid var(--dshmd-border);
+  color: var(--dshmd-fg-dim);
+  position: sticky;
+  top: 0;
+  background: var(--dshmd-bg-head);
+  z-index: 2;
+}
+.dshmd-editor .vditor-outline li > span { color: var(--dshmd-fg-dim); }
+.dshmd-editor .vditor-outline li > span:hover { color: var(--dshmd-fg); background: rgba(127, 127, 127, .16); }
+.dshmd-editor .vditor-ir,
+.dshmd-editor .vditor-wysiwyg,
+.dshmd-editor .vditor-sv { min-width: 0; }
+/* 窄屏：草稿栏折到下方 */
+@media (max-width: 720px) {
+  .dshmd-body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+  .dshmd-drafts { border-left: 0; border-top: 1px solid var(--dshmd-border); max-height: 132px; }
+}

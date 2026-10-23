@@ -1,0 +1,87 @@
+{
+  "name": "dsh-md-composer",
+  "version": "0.2.0",
+  "description": "DSH Web plugin: a Markdown editor floating over the composer, powered by Vditor (offline parser, icons and zh_CN locale inlined).",
+  "type": "module",
+  "license": "MIT",
+  "author": "lalilulelo3",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lalilulelo3/dsh-md-composer.git"
+  },
+  "homepage": "https://github.com/lalilulelo3/dsh-md-composer#readme",
+  "bugs": {
+    "url": "https://github.com/lalilulelo3/dsh-md-composer/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "markdown",
+    "editor",
+    "vditor",
+    "composer"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "types": "./lib/types/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "lib/types/**/*.d.ts",
+    "cordis.patch.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "external": [
+        "react",
+        "react/jsx-runtime"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@types/react": "~18.3.1",
+    "@types/react-dom": "~18.3.1",
+    "esbuild": "^0.25.0",
+    "react": "^18.2.0",
+    "typescript": "^5.6.0",
+    "vditor": "^4.0.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run build",
+    "verify:m0": "node scripts/verify-m0.mjs",
+    "verify:panel": "node scripts/verify-panel.mjs"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

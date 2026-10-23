@@ -1,0 +1,7 @@
+node_modules/
+_testhome/
+_shots/
+*.tgz
+*.log
+.DS_Store
+Thumbs.db

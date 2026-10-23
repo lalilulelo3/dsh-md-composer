@@ -1,0 +1,5 @@
+# 启用本插件：把 dsh-md-composer 这一条 Loader entry 插入组合树。
+# `dsh plugin --profile web add <本目录>` 会把包名写进 profile 的 dsh.profile.bundles。
+- insert:
+    - id: md-composer
+      name: 'dsh-md-composer'
